@@ -1,0 +1,93 @@
+/* Global Theme - Premium Light */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg-base: #F7F9F8;
+  --primary-gradient: linear-gradient(135deg, #4A6772, #5C7C89);
+
+  --primary: #4A6772;
+  --primary-dark: #3B515B;
+  --primary-glow: rgba(74, 103, 114, 0.2);
+  
+  --secondary: #829787;
+  --secondary-dark: #6D7E71;
+  
+  --accent: #C18B7A;
+  
+  --text-primary: #2C3335;
+  --text-secondary: #4A5558;
+  --text-muted: #7A8689;
+  
+  --border: rgba(44, 51, 53, 0.1);
+  --border-light: rgba(44, 51, 53, 0.05);
+  
+  --card-bg: #FFFFFF;
+  --card-bg-hover: #FDFEFE;
+  
+  --header-bg: rgba(255, 255, 255, 0.95);
+
+  --skill-bg: rgba(130, 151, 135, 0.15);
+  --skill-text: #829787;
+  
+  --danger: #D16B6B;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: linear-gradient(135deg, #F3F2EF, #EAF3FF);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+.appLoading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: pulseNeon 2s infinite alternate;
+}
+
+@keyframes pulseNeon {
+  0% { opacity: 0.6; text-shadow: 0 0 10px transparent; }
+  100% { opacity: 1; text-shadow: 0 0 20px var(--primary-glow); }
+}
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+a:hover {
+  color: var(--primary-dark);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-base); }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+
+@media (max-width: 600px) {
+  body {
+    font-size: 15px;
+  }
+}

@@ -1,0 +1,25 @@
+.profile {
+  width: 100%;
+}
+
+.loading,
+.error,
+.empty {
+  margin: 1rem 0;
+  color: var(--text-muted, #666);
+}
+
+.error {
+  color: #c00;
+}
+
+.postsSection {
+  margin-top: 2rem;
+}
+
+.sectionTitle {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary, #1a1a1a);
+}
