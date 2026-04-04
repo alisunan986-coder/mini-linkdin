@@ -9,15 +9,25 @@ import pool from '../config/db.js';
  */
 export const getAllPosts = async (req, res) => {
   try {
+    const userId = req.user ? req.user.id : null;
     const [rows] = await pool.query(`
       SELECT p.id, p.user_id, p.content, p.image_url, p.created_at,
-             u.name AS user_name, u.profile_picture AS user_profile_picture,
+             u.name AS user_name, u.profile_picture AS user_profile_picture, u.bio AS user_bio,
              (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
-             (SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comment_count
+             (SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comment_count,
+             CASE 
+               WHEN p.user_id = ? THEN 1
+               WHEN p.user_id IN (
+                 SELECT connected_user_id FROM connections WHERE user_id = ? AND status = 'accepted'
+                 UNION
+                 SELECT user_id FROM connections WHERE connected_user_id = ? AND status = 'accepted'
+               ) THEN 1 
+               ELSE 0 
+             END AS is_connection
       FROM posts p
       JOIN users u ON p.user_id = u.id
-      ORDER BY p.created_at DESC
-    `);
+      ORDER BY is_connection DESC, p.created_at DESC
+    `, [userId, userId, userId]);
     res.json(rows);
   } catch (err) {
     console.error('getAllPosts error:', err);
@@ -67,7 +77,7 @@ export const createPost = async (req, res) => {
     );
     const [newPost] = await pool.query(`
       SELECT p.id, p.user_id, p.content, p.image_url, p.created_at,
-             u.name AS user_name, u.profile_picture AS user_profile_picture,
+             u.name AS user_name, u.profile_picture AS user_profile_picture, u.bio AS user_bio,
              0 AS like_count, 0 AS comment_count
       FROM posts p
       JOIN users u ON p.user_id = u.id
