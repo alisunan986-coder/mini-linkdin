@@ -66,49 +66,126 @@ export default function Dashboard() {
 
   return (
     <div className={styles.dashboard}>
-      <h1 className={styles.title}>Feed</h1>
-      {user && (
-        <form onSubmit={handleCreatePost} className={styles.createForm}>
-          <textarea
-            value={newPost}
-            onChange={(e) => setNewPost(e.target.value)}
-            placeholder="What's on your mind?"
-            rows={3}
-            className={styles.textarea}
-          />
-          <div className={styles.createActions}>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setPostImage(e.target.files[0])}
-              id="post-image-input"
-              hidden
-            />
-            <label htmlFor="post-image-input" className={styles.imageLabel}>
-              📷 {postImage ? 'Image selected' : 'Add photo'}
-            </label>
-            <button type="submit" className={styles.submitBtn} disabled={submitting || !newPost.trim()}>
-              Post
-            </button>
+      <aside className={styles.leftSidebar}>
+        {user && (
+          <div className={styles.profileCard}>
+            <div className={styles.cardHeader}></div>
+            <div className={styles.cardInfo}>
+              <div className={styles.avatarWrapper}>
+                {user.profile_picture ? (
+                  <img src={user.profile_picture} className={styles.sidebarAvatar} />
+                ) : (
+                  <div className={styles.avatarPlaceholder}>{user.name.charAt(0)}</div>
+                )}
+              </div>
+              <h2 className={styles.sidebarName}>{user.name}</h2>
+              <p className={styles.sidebarBio}>{user.bio || 'Professional'}</p>
+            </div>
+            <div className={styles.cardStats}>
+              <div className={styles.statRow}>
+                <span>Who viewed your profile</span>
+                <span className={styles.statValue}>42</span>
+              </div>
+              <div className={styles.statRow}>
+                <span>Impressions of your post</span>
+                <span className={styles.statValue}>1,204</span>
+              </div>
+            </div>
           </div>
-        </form>
-      )}
-      {loading ? (
-        <p className={styles.loading}>Loading feed...</p>
-      ) : posts.length === 0 ? (
-        <p className={styles.empty}>No posts yet. Be the first to share!</p>
-      ) : (
-        <div className={styles.feed}>
-          {posts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              onUpdate={handlePostUpdate}
-              onDelete={handlePostDelete}
-            />
-          ))}
+        )}
+      </aside>
+
+      <main className={styles.mainFeed}>
+        {user && (
+          <div className={styles.createPostBox}>
+            <div className={styles.inputWrapper}>
+              {user.profile_picture ? (
+                <img src={user.profile_picture} className={styles.tinyAvatar} />
+              ) : (
+                <div className={styles.tinyAvatarPlaceholder}>{user.name.charAt(0)}</div>
+              )}
+              <form onSubmit={handleCreatePost} className={styles.createForm}>
+                <input
+                  type="text"
+                  value={newPost}
+                  onChange={(e) => setNewPost(e.target.value)}
+                  placeholder="Start a post"
+                  className={styles.pillsInput}
+                />
+                <button 
+                  type="submit" 
+                  className={styles.postBtn}
+                  disabled={!newPost.trim() || submitting}
+                >
+                  {submitting ? 'Posting...' : 'Post'}
+                </button>
+              </form>
+            </div>
+            <div className={styles.createActions}>
+              <label htmlFor="post-image-input" className={styles.actionBtn}>
+                <span className={styles.icon}>📷</span> Photo
+              </label>
+              <button type="button" className={styles.actionBtn}>
+                <span className={styles.icon}>🎥</span> Video
+              </button>
+              <button type="button" className={styles.actionBtn}>
+                <span className={styles.icon}>💼</span> Job
+              </button>
+              <button type="button" className={styles.actionBtn}>
+                <span className={styles.icon}>✍️</span> Write article
+              </button>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setPostImage(e.target.files[0])}
+                id="post-image-input"
+                hidden
+              />
+            </div>
+            {postImage && (
+              <p className={styles.imageNotify}>✓ Image selected: {postImage.name}</p>
+            )}
+          </div>
+        )}
+
+        {loading ? (
+          <p className={styles.msg}>Discovering professional insights...</p>
+        ) : posts.length === 0 ? (
+          <p className={styles.msg}>No posts yet. Be the first to share!</p>
+        ) : (
+          <div className={styles.feed}>
+            {posts.map((post) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                onUpdate={handlePostUpdate}
+                onDelete={handlePostDelete}
+              />
+            ))}
+          </div>
+        )}
+      </main>
+
+      <aside className={styles.rightSidebar}>
+        <div className={styles.newsCard}>
+          <h3 className={styles.newsTitle}>SmartHire News</h3>
+          <ul className={styles.newsList}>
+            <li>
+              <span className={styles.newsHeadline}>The future of Remote Work 2026</span>
+              <span className={styles.newsMeta}>4h ago • 12,042 readers</span>
+            </li>
+            <li>
+              <span className={styles.newsHeadline}>Top 10 skills for AI Engineers</span>
+              <span className={styles.newsMeta}>1d ago • 45,910 readers</span>
+            </li>
+            <li>
+              <span className={styles.newsHeadline}>How to optimize your LinkedIn profile</span>
+              <span className={styles.newsMeta}>2d ago • 8,110 readers</span>
+            </li>
+          </ul>
+          <button className={styles.showMoreBtn}>Show more</button>
         </div>
-      )}
+      </aside>
     </div>
   );
 }

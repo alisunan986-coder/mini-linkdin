@@ -6,6 +6,7 @@ import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { getMe, getUserById, updateMe, getAllUsers, searchUsers } from '../controllers/userController.js';
+import { getUserActivity } from '../controllers/postController.js';
 import { authenticateToken } from '../middleware/auth.js';
 
 const storage = multer.diskStorage({
@@ -35,5 +36,6 @@ export default function userRoutes(router) {
   router.get('/me', authenticateToken, getMe);
   router.put('/me', authenticateToken, upload.single('avatar'), updateValidation, updateMe);
   router.get('/:id', getUserById);
+  router.get('/:id/activity', getUserActivity);
   return router;
 }

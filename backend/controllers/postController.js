@@ -15,6 +15,7 @@ export const getAllPosts = async (req, res) => {
              u.name AS user_name, u.profile_picture AS user_profile_picture, u.bio AS user_bio,
              (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
              (SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comment_count,
+             (SELECT COUNT(*) FROM reposts WHERE post_id = p.id) AS repost_count,
              CASE 
                WHEN p.user_id = ? THEN 1
                WHEN p.user_id IN (
@@ -140,6 +141,94 @@ export const deletePost = async (req, res) => {
     res.json({ message: 'Post deleted' });
   } catch (err) {
     console.error('deletePost error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+/**
+ * POST /api/posts/:id/repost - Toggle repost
+ */
+export const toggleRepost = async (req, res) => {
+  try {
+    const postId = req.params.id;
+    const userId = req.user.id;
+
+    const [existing] = await pool.query(
+      'SELECT id FROM reposts WHERE user_id = ? AND post_id = ?',
+      [userId, postId]
+    );
+
+    if (existing.length > 0) {
+      await pool.query('DELETE FROM reposts WHERE id = ?', [existing[0].id]);
+      return res.json({ reposted: false });
+    } else {
+      await pool.query(
+        'INSERT INTO reposts (user_id, post_id) VALUES (?, ?)',
+        [userId, postId]
+      );
+      return res.json({ reposted: true });
+    }
+  } catch (err) {
+    console.error('toggleRepost error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+/**
+ * GET /api/users/:id/activity - Get posts and reposts for profile
+ */
+export const getUserActivity = async (req, res) => {
+  try {
+    const targetUserId = req.params.id;
+
+    const [rows] = await pool.query(`
+      SELECT p.id, p.user_id, p.content, p.image_url, p.created_at,
+             u.name AS user_name, u.profile_picture AS user_profile_picture, u.bio AS user_bio,
+             (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
+             (SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comment_count,
+             (SELECT COUNT(*) FROM reposts WHERE post_id = p.id) AS repost_count,
+             NULL AS reposted_by_name, -- Not a repost in this branch
+             p.created_at AS activity_date
+      FROM posts p
+      JOIN users u ON p.user_id = u.id
+      WHERE p.user_id = ?
+
+      UNION ALL
+
+      SELECT p.id, p.user_id, p.content, p.image_url, p.created_at,
+             u.name AS user_name, u.profile_picture AS user_profile_picture, u.bio AS user_bio,
+             (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
+             (SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comment_count,
+             (SELECT COUNT(*) FROM reposts WHERE post_id = p.id) AS repost_count,
+             target_u.name AS reposted_by_name,
+             r.created_at AS activity_date
+      FROM reposts r
+      JOIN posts p ON r.post_id = p.id
+      JOIN users u ON p.user_id = u.id
+      JOIN users target_u ON r.user_id = target_u.id
+      WHERE r.user_id = ?
+
+      ORDER BY activity_date DESC
+    `, [targetUserId, targetUserId]);
+
+    res.json(rows);
+  } catch (err) {
+    console.error('getUserActivity error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+/**
+ * GET /api/posts/:id/repost-status
+ */
+export const getRepostStatus = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      'SELECT id FROM reposts WHERE user_id = ? AND post_id = ?',
+      [req.user.id, req.params.id]
+    );
+    res.json({ reposted: rows.length > 0 });
+  } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
 };

@@ -20,6 +20,10 @@ export default function Jobs() {
   const [description, setDescription] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  // Search & Filter State
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState('All');
+
   useEffect(() => {
     fetchJobs();
   }, []);
@@ -36,15 +40,16 @@ export default function Jobs() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
+    console.log('[DEBUG] Posting Job:', { title, company, location, type, description });
     try {
       const newJob = await api.jobs.create({ title, company, location, type, description });
+      console.log('[DEBUG] Job Created:', newJob);
       setJobs([newJob, ...jobs]);
       setShowForm(false);
       // Reset form
       setTitle(''); setCompany(''); setLocation(''); setDescription('');
     } catch (err) {
+      console.error('[DEBUG] Post Job Error:', err);
       alert(err.error || 'Failed to post job');
     } finally {
       setSubmitting(false);
@@ -60,6 +65,16 @@ export default function Jobs() {
       alert('Failed to delete job');
     }
   };
+
+  const filteredJobs = jobs.filter(job => {
+    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          job.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          job.company.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = filterType === 'All' || job.type === filterType;
+    return matchesSearch && matchesType;
+  });
+
+  const handleApply = () => alert('Apply functionality coming soon! For now, please contact the poster.');
 
   return (
     <div className={styles.container}>
@@ -114,31 +129,73 @@ export default function Jobs() {
         </form>
       )}
 
+      <div className={styles.searchBar}>
+        <div className={styles.searchWrapper}>
+          <span className={styles.searchIcon}>🔍</span>
+          <input 
+            type="text" 
+            placeholder="Search by title, company, or location..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className={styles.searchInput}
+          />
+        </div>
+        <select 
+          className={styles.filterSelect}
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value)}
+        >
+          <option value="All">All Types</option>
+          <option value="Full-time">Full-time</option>
+          <option value="Part-time">Part-time</option>
+          <option value="Internship">Internship</option>
+          <option value="Contract">Contract</option>
+        </select>
+      </div>
+
       {loading ? (
         <p className={styles.msg}>Loading opportunities...</p>
-      ) : jobs.length === 0 ? (
-        <p className={styles.msg}>No jobs listed yet. Be the first!</p>
+      ) : filteredJobs.length === 0 ? (
+        <div className={styles.emptyState}>
+          <span className={styles.emptyIcon}>📂</span>
+          <p>No matching opportunities found.</p>
+          {(searchTerm || filterType !== 'All') && (
+            <button 
+              className={styles.clearBtn}
+              onClick={() => { setSearchTerm(''); setFilterType('All'); }}
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
       ) : (
         <div className={styles.jobList}>
-          {jobs.map((job) => (
+          {filteredJobs.map((job) => (
             <div key={job.id} className={styles.jobCard}>
               <div className={styles.cardHeader}>
                 <div>
                   <h3 className={styles.jobTitle}>{job.title}</h3>
                   <p className={styles.companyInfo}>{job.company} • {job.location}</p>
                 </div>
-                <span className={`${styles.badge} ${styles[job.type.toLowerCase()]}`}>
+                <span className={`${styles.badge} ${styles[job.type.toLowerCase().replace('-', '')]}`}>
                   {job.type}
                 </span>
               </div>
               <p className={styles.description}>{job.description}</p>
               <div className={styles.cardFooter}>
-                <span className={styles.postedBy}>Posted by: {job.poster_name || 'HR'}</span>
-                {user?.id === job.user_id && (
-                  <button onClick={() => handleDelete(job.id)} className={styles.deleteBtn}>
-                    Delete
+                <div className={styles.footerLeft}>
+                  <span className={styles.postedBy}>Posted by: {job.poster_name || 'HR'}</span>
+                </div>
+                <div className={styles.footerRight}>
+                  <button onClick={handleApply} className={styles.applyBtn}>
+                    Apply Now
                   </button>
-                )}
+                  {user?.id === job.user_id && (
+                    <button onClick={() => handleDelete(job.id)} className={styles.deleteBtn}>
+                      Delete
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}

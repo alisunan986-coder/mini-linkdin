@@ -23,3 +23,68 @@
   font-weight: 600;
   color: var(--text-primary, #1a1a1a);
 }
+
+.connectionBar {
+  background: white;
+  margin-bottom: 20px;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  display: flex;
+  justify-content: center;
+}
+
+.connectBtn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 40px;
+  border-radius: 25px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.connectBtn:hover {
+  background: var(--primary-dark);
+  transform: scale(1.05);
+}
+
+.connectedState {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+.removeBtn, .ignoreBtn {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-light);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.pendingBtn {
+  background: var(--bg-base);
+  color: var(--text-muted);
+  border: none;
+  padding: 10px 40px;
+  border-radius: 25px;
+  cursor: default;
+}
+
+.pendingActions {
+  display: flex;
+  gap: 12px;
+}
+
+.acceptBtn {
+  background: var(--secondary);
+  color: white;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-weight: 600;
+}

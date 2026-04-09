@@ -13,8 +13,10 @@ const MAX_CHAR_COLLAPSE = 250;
 export default function PostCard({ post, onUpdate, onDelete }) {
   const { user } = useAuth();
   const [liked, setLiked] = useState(false);
+  const [reposted, setReposted] = useState(false);
   const [likeCount, setLikeCount] = useState(Number(post.like_count) || 0);
   const [commentCount, setCommentCount] = useState(Number(post.comment_count) || 0);
+  const [repostCount, setRepostCount] = useState(Number(post.repost_count) || 0);
   const [showComments, setShowComments] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
@@ -29,7 +31,14 @@ export default function PostCard({ post, onUpdate, onDelete }) {
 
   useEffect(() => {
     if (user) {
-      api.posts.getLikeStatus(post.id).then((r) => setLiked(r.liked)).catch(() => {});
+      // Get statuses
+      Promise.all([
+        api.posts.getLikeStatus(post.id),
+        api.posts.getRepostStatus(post.id)
+      ]).then(([l, r]) => {
+        setLiked(l.liked);
+        setReposted(r.reposted);
+      }).catch(() => {});
     }
   }, [user, post.id]);
 
@@ -41,6 +50,18 @@ export default function PostCard({ post, onUpdate, onDelete }) {
       setLikeCount((c) => (res.liked ? c + 1 : c - 1));
     } catch (err) {
       alert(err.error || 'Failed to like');
+    }
+  };
+
+  const handleRepost = async () => {
+    if (!user) return;
+    try {
+      const res = await api.posts.toggleRepost(post.id);
+      setReposted(res.reposted);
+      setRepostCount((c) => (res.reposted ? c + 1 : c - 1));
+      if (res.reposted) alert('Post shared to your profile!');
+    } catch (err) {
+      alert('Failed to repost');
     }
   };
 
@@ -78,6 +99,15 @@ export default function PostCard({ post, onUpdate, onDelete }) {
 
   return (
     <article className={styles.card}>
+      {post.reposted_by_name && (
+        <div className={styles.repostHeader}>
+          <span className={styles.repostIcon}>🔄</span>
+          <span className={styles.repostTag}>
+            {user?.name === post.reposted_by_name ? 'You' : post.reposted_by_name} reposted this
+          </span>
+        </div>
+      )}
+      
       <div className={styles.header}>
         <Link to={`/profile/${post.user_id}`} className={styles.avatarLink}>
           {post.user_profile_picture ? (
@@ -143,19 +173,22 @@ export default function PostCard({ post, onUpdate, onDelete }) {
       </div>
 
       <div className={styles.stats}>
-        <span className={styles.statItem}>👍 {likeCount}</span>
+        <div className={styles.statLeft}>
+          <span className={styles.statItem}>👍 {likeCount}</span>
+          {repostCount > 0 && <span className={styles.statItem}>🔄 {repostCount}</span>}
+        </div>
         <span className={styles.statItem}>{commentCount} comments</span>
       </div>
 
       <div className={styles.footer}>
         <button onClick={handleLike} className={liked ? styles.actionBtnActive : styles.actionBtn}>
-          <span className={styles.footerIcon}>{liked ? '👍' : '👍'}</span> Like
+          <span className={styles.footerIcon}>👍</span> Like
         </button>
         <button onClick={() => setShowComments(!showComments)} className={styles.actionBtn}>
           <span className={styles.footerIcon}>💬</span> Comment
         </button>
-        <button className={styles.actionBtn}>
-          <span className={styles.footerIcon}>🔁</span> Repost
+        <button onClick={handleRepost} className={reposted ? styles.actionBtnActive : styles.actionBtn}>
+          <span className={styles.footerIcon}>🔄</span> Repost
         </button>
         <button className={styles.actionBtn}>
           <span className={styles.footerIcon}>✈️</span> Send

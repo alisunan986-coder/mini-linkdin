@@ -1,22 +1,13 @@
-/**
- * Auth routes - Register & Login
- */
-import { body } from 'express-validator';
+import express from 'express';
 import { register, login } from '../controllers/authController.js';
 
-const registerValidation = [
-  body('name').trim().notEmpty().withMessage('Name is required').isLength({ max: 255 }),
-  body('email').trim().isEmail().withMessage('Valid email required'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
-];
+const router = express.Router();
 
-const loginValidation = [
-  body('email').trim().isEmail().withMessage('Valid email required'),
-  body('password').notEmpty().withMessage('Password is required')
-];
+// Public routes for Authentication
+router.post('/register', register);
+router.post('/login', login);
 
-export default function authRoutes(router) {
-  router.post('/register', registerValidation, register);
-  router.post('/login', loginValidation, login);
-  return router;
+export default function authRoutes(parentRouter) {
+  parentRouter.use('/', router);
+  return parentRouter;
 }

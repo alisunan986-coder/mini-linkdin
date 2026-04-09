@@ -7,7 +7,9 @@ import {
   getPostById,
   createPost,
   updatePost,
-  deletePost
+  deletePost,
+  toggleRepost,
+  getRepostStatus
 } from '../controllers/postController.js';
 import { getCommentsByPostId, createComment } from '../controllers/commentController.js';
 import { toggleLike, getLikeStatus } from '../controllers/likeController.js';
@@ -45,6 +47,9 @@ export default function postRoutes(router) {
 
   router.post('/:postId/like', authenticateToken, toggleLike);
   router.get('/:postId/like', authenticateToken, getLikeStatus);
+
+  router.post('/:id/repost', authenticateToken, toggleRepost);
+  router.get('/:id/repost', authenticateToken, getRepostStatus);
 
   return router;
 }

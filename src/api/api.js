@@ -46,6 +46,7 @@ export const api = {
     getMe: () => request('/api/users/me'),
     getById: (id) => request(`/api/users/${id}`),
     updateMe: (body) => request('/api/users/me', { method: 'PUT', body: body instanceof FormData ? body : JSON.stringify(body) }),
+    getActivity: (id) => request(`/api/users/${id}/activity`),
   },
   posts: {
     getAll: () => request('/api/posts'),
@@ -57,11 +58,20 @@ export const api = {
     addComment: (postId, body) => request(`/api/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify(body) }),
     toggleLike: (postId) => request(`/api/posts/${postId}/like`, { method: 'POST' }),
     getLikeStatus: (postId) => request(`/api/posts/${postId}/like`),
+    toggleRepost: (postId) => request(`/api/posts/${postId}/repost`, { method: 'POST' }),
+    getRepostStatus: (postId) => request(`/api/posts/${postId}/repost`),
   },
   jobs: {
     getAll: () => request('/api/jobs'),
     create: (body) => request('/api/jobs', { method: 'POST', body: JSON.stringify(body) }),
     delete: (id) => request(`/api/jobs/${id}`, { method: 'DELETE' }),
+  },
+  connections: {
+    getSuggestions: () => request('/api/connections/suggestions'),
+    getPending: () => request('/api/connections/pending'),
+    sendRequest: (userId) => request(`/api/connections/request/${userId}`, { method: 'POST' }),
+    accept: (userId) => request(`/api/connections/accept/${userId}`, { method: 'PUT' }),
+    remove: (userId) => request(`/api/connections/${userId}`, { method: 'DELETE' }),
   },
   comments: {
     delete: (id) => request(`/api/comments/${id}`, { method: 'DELETE' }),

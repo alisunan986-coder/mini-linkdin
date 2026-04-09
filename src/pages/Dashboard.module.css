@@ -1,110 +1,266 @@
 .dashboard {
-  max-width: 600px;
+  max-width: 1128px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 225px 1fr 300px;
+  gap: 24px;
+  padding: 24px 0;
+}
+
+/* Sidebar Styles */
+.leftSidebar, .rightSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profileCard, .newsCard {
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.cardHeader {
+  height: 56px;
+  background: var(--primary-gradient);
+}
+
+.cardInfo {
+  padding: 0 12px 16px 12px;
+  text-align: center;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.avatarWrapper {
+  margin-top: -36px;
+  margin-bottom: 12px;
+}
+
+.sidebarAvatar, .avatarPlaceholder {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid white;
+  background: white;
+  object-fit: cover;
   margin: 0 auto;
 }
 
-.createForm {
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 32px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+.avatarPlaceholder {
+  background: var(--bg-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary);
 }
 
-.createForm:focus-within {
-  border-color: var(--primary);
-  box-shadow: 0 4px 25px rgba(10, 102, 194, 0.1);
-}
-
-.createInput {
-  width: 100%;
-  border: none;
-  background: transparent;
-  font-size: 18px;
+.sidebarName {
+  font-size: 1rem;
+  font-weight: 600;
   color: var(--text-primary);
-  resize: none;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-light);
-  margin-bottom: 12px;
-  font-family: inherit;
-  transition: border-color 0.3s;
+  margin: 0 0 4px 0;
 }
 
-.createInput:focus {
-  outline: none;
-  border-color: var(--primary);
-}
-
-.createInput::placeholder {
+.sidebarBio {
+  font-size: 0.75rem;
   color: var(--text-muted);
+  margin: 0;
+}
+
+.cardStats {
+  padding: 12px;
+}
+
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  padding: 4px 0;
+}
+
+.statValue {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* Create Post Box */
+.createPostBox {
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.inputWrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.tinyAvatar, .tinyAvatarPlaceholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.tinyAvatarPlaceholder {
+  background: var(--bg-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.createForm {
+  flex: 1;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.pillsInput {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 35px;
+  border: 1px solid var(--border-light);
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pillsInput:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.postBtn {
+  background: var(--primary-gradient);
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.postBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(10, 102, 194, 0.3);
+}
+
+.postBtn:disabled {
+  background: #E2E8F0;
+  color: var(--text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .createActions {
   display: flex;
   justify-content: space-between;
+}
+
+.actionBtn {
+  display: flex;
   align-items: center;
-  margin-top: 8px;
-}
-
-.imageLabel {
-  background: var(--skill-bg);
-  color: var(--primary);
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.imageLabel:hover {
-  background: rgba(10, 102, 194, 0.15);
-}
-
-.submitBtn {
-  background: var(--primary-gradient);
-  color: #FFFFFF;
+  gap: 8px;
+  background: transparent;
   border: none;
-  padding: 8px 24px;
-  border-radius: 20px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
   font-weight: 600;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-.submitBtn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(10, 102, 194, 0.4);
+.actionBtn:hover {
+  background: rgba(0,0,0,0.05);
 }
 
-.submitBtn:disabled {
-  background: #E2E8F0;
-  color: var(--text-muted);
-  cursor: not-allowed;
+.icon {
+  font-size: 1.1rem;
 }
 
-.feed {
+.imageNotify {
+  font-size: 0.75rem;
+  color: var(--secondary);
+  margin-top: 8px;
+  padding-left: 56px;
+}
+
+/* News Section */
+.newsCard {
+  padding: 12px;
+}
+
+.newsTitle {
+  font-size: 1rem;
+  margin: 0 0 12px 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.newsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 12px;
 }
 
-.loading {
-  text-align: center;
-  color: var(--primary);
-  font-weight: 500;
-  animation: pulseNeon 1.5s infinite alternate;
+.newsHeadline {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
 }
 
-.empty {
+.newsMeta {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.showMoreBtn {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 8px;
+  margin-top: 12px;
+  cursor: pointer;
+}
+
+.msg {
   text-align: center;
   color: var(--text-muted);
   padding: 40px;
-  background: var(--card-bg);
-  border-radius: 12px;
-  border: 1px dashed var(--border);
+}
+
+@media (max-width: 992px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+  .leftSidebar, .rightSidebar {
+    display: none;
+  }
 }

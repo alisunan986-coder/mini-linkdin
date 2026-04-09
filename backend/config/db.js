@@ -2,8 +2,11 @@ import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 
 const dbPromise = open({
-  filename: '../database/database.sqlite',
+  filename: '../database.sqlite', // File is in the backend root, not a subfolder
   driver: sqlite3.Database
+}).catch(err => {
+  console.error('FAILED TO OPEN DATABASE:', err.message);
+  throw err;
 });
 
 const pool = {
@@ -77,6 +80,16 @@ const pool = {
       FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
+    CREATE TABLE IF NOT EXISTS connections (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      connected_user_id INTEGER NOT NULL,
+      status TEXT CHECK(status IN ('pending', 'accepted')) DEFAULT 'pending',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, connected_user_id),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (connected_user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
     CREATE TABLE IF NOT EXISTS likes (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       post_id INTEGER NOT NULL,
@@ -85,6 +98,15 @@ const pool = {
       UNIQUE (post_id, user_id),
       FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+    CREATE TABLE IF NOT EXISTS reposts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      post_id INTEGER NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, post_id),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
     );
     PRAGMA foreign_keys = ON;
   `);

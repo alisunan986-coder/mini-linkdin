@@ -1,162 +1,242 @@
 .network {
   max-width: 1000px;
   margin: 0 auto;
+  padding: 20px;
 }
 
 .header {
+  margin-bottom: 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
-  flex-wrap: wrap;
-  gap: 16px;
 }
 
 .title {
+  font-size: 1.8rem;
+  color: var(--primary);
   margin: 0;
-  font-size: 28px;
-  font-weight: 600;
-  letter-spacing: -0.5px;
-  color: var(--text-primary);
 }
 
 .searchBox {
-  flex: 1;
-  max-width: 300px;
+  display: flex;
+  gap: 10px;
+  flex: 0 0 400px;
 }
 
 .searchInput {
-  width: 100%;
+  flex: 1;
   padding: 10px 16px;
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  background: var(--card-bg);
-  backdrop-filter: blur(8px);
-  color: var(--text-primary);
+  border-radius: 20px;
+  border: 1px solid var(--border-light);
+  background: white;
   font-family: inherit;
-  font-size: 14px;
-  transition: all 0.3s ease;
 }
 
-.searchInput:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-glow);
-  background: var(--card-bg-hover);
+.searchBtn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.loading, .empty {
-  text-align: center;
-  color: var(--text-muted);
-  padding: 40px;
+.searchBtn:hover {
+  background: var(--primary-dark);
+  transform: scale(1.05);
 }
 
-.loading {
+.sectionTitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* Pending Invitations */
+.pendingSection {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--border-light);
+  margin-bottom: 30px;
+}
+
+.pendingList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pendingCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.pendingCard:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.pendingInfo {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.smallAvatar, .smallAvatarPlaceholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.smallAvatarPlaceholder {
+  background: var(--bg-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
   color: var(--primary);
-  animation: pulseNeon 1.5s infinite alternate;
 }
 
+.pendingName {
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+}
+
+.pendingBio {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.pendingActions {
+  display: flex;
+  gap: 10px;
+}
+
+.acceptBtn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 15px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.ignoreBtn {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* Suggestions Grid */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
 }
 
 .card {
-  background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  transition: transform 0.2s;
 }
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
-  border-color: rgba(10, 102, 194, 0.2);
 }
 
 .headerBg {
-  height: 64px;
-  background: linear-gradient(135deg, rgba(241, 245, 249, 1), rgba(10, 102, 194, 0.15));
-  border-bottom: 1px solid var(--border-light);
+  height: 60px;
+  background: var(--primary-gradient);
 }
 
 .avatarWrapper {
-  margin-top: -36px;
-  display: flex;
-  justify-content: center;
+  margin-top: -30px;
+  margin-bottom: 10px;
 }
 
 .avatar, .avatarPlaceholder {
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  border: 4px solid var(--card-bg);
+  border: 4px solid white;
+  background: white;
   object-fit: cover;
-  background: #E2E8F0;
+}
+
+.avatarPlaceholder {
+  background: #eee;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: var(--primary);
-  text-transform: uppercase;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  color: #666;
+  margin: 0 auto;
 }
 
 .info {
-  padding: 16px 20px 24px;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
+  padding: 15px;
 }
 
 .name {
-  margin: 0 0 8px;
-  font-size: 18px;
-  font-weight: 600;
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
   color: var(--text-primary);
 }
 
 .bio {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin: 0 0 20px;
-  line-height: 1.5;
-  flex-grow: 1;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+  margin: 0 0 15px 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  height: 2.6rem;
   overflow: hidden;
 }
 
-.viewBtn {
-  display: inline-block;
-  width: 100%;
-  padding: 10px;
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.connectBtn {
   background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-  border-radius: 24px;
-  transition: all 0.3s ease;
-}
-
-.card:hover .viewBtn {
-  border-color: var(--primary);
-  background: rgba(10, 102, 194, 0.05);
+  border: 1px solid var(--primary);
   color: var(--primary);
+  padding: 6px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s;
 }
 
-.viewBtn:active {
-  transform: scale(0.98);
+.connectBtn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.viewBtn {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.msg {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px;
 }

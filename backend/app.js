@@ -9,6 +9,7 @@ import postRoutes from './routes/postRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import skillRoutes from './routes/skillRoutes.js';
 import jobRoutes from './routes/jobRoutes.js';
+import connectionRoutes from './routes/connectionRoutes.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -30,6 +31,7 @@ app.use('/api/posts', postRoutes(express.Router()));
 app.use('/api/comments', commentRoutes(express.Router()));
 app.use('/api/skills', skillRoutes(express.Router()));
 app.use('/api/jobs', jobRoutes(express.Router()));
+app.use('/api/connections', connectionRoutes(express.Router()));
 
 // Serve static profile pictures
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -42,8 +44,15 @@ app.use((req, res) => res.status(404).json({ error: 'Not found' }));
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(500).json({ error: 'Server error' });
+  console.error('[Global Error Handler]');
+  console.error(`Method: ${req.method} | URL: ${req.originalUrl}`);
+  console.error('Message:', err.message);
+  console.error('Stack:', err.stack);
+  res.status(500).json({ 
+    error: 'Server error', 
+    message: err.message,
+    path: req.originalUrl
+  });
 });
 
 export default app;
