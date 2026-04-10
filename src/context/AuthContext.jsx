@@ -20,6 +20,7 @@ api.interceptors.request.use((config) => {
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [notificationCount, setNotificationCount] = useState(0);
 
   // Initialize Auth from LocalStorage on mount (Restore session on refresh)
   useEffect(() => {
@@ -34,6 +35,7 @@ export function AuthProvider({ children }) {
         // Verify token by getting the current user profile
         const response = await api.get('/api/users/me');
         setUser(response.data);
+        fetchNotifications(); // Initial fetch
       } catch (error) {
         console.error('[Auth] Session restoration failed:', error.message);
         localStorage.removeItem('token');
@@ -46,6 +48,15 @@ export function AuthProvider({ children }) {
     initializeAuth();
   }, []);
 
+  const fetchNotifications = async () => {
+    try {
+      const response = await api.get('/api/connections/pending');
+      setNotificationCount(response.data.length);
+    } catch (error) {
+      console.error('[Auth] Failed to fetch notifications:', error.message);
+    }
+  };
+
   const login = async (email, password) => {
     try {
       const response = await api.post('/api/auth/login', { email, password });
@@ -53,6 +64,7 @@ export function AuthProvider({ children }) {
       
       localStorage.setItem('token', token);
       setUser(user);
+      fetchNotifications();
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.error || 'Login failed. Please check your credentials.';
@@ -67,6 +79,7 @@ export function AuthProvider({ children }) {
 
       localStorage.setItem('token', token);
       setUser(user);
+      fetchNotifications();
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.error || 'Registration failed. Please try again.';
@@ -77,6 +90,7 @@ export function AuthProvider({ children }) {
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
+    setNotificationCount(0);
   };
 
   const updateUser = (updated) => setUser((prev) => (prev ? { ...prev, ...updated } : null));
@@ -84,6 +98,8 @@ export function AuthProvider({ children }) {
   const authValue = {
     user,
     loading,
+    notificationCount,
+    fetchNotifications,
     login,
     register,
     logout,

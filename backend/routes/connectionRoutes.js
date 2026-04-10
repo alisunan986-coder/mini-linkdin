@@ -6,13 +6,15 @@ import {
   getPendingRequests, 
   sendRequest, 
   acceptRequest, 
-  removeConnection 
+  removeConnection,
+  getAcceptedConnections
 } from '../controllers/connectionController.js';
 import { authenticateToken } from '../middleware/auth.js';
 
 export default function connectionRoutes(router) {
   router.get('/suggestions', authenticateToken, getSuggestions);
   router.get('/pending', authenticateToken, getPendingRequests);
+  router.get('/accepted', authenticateToken, getAcceptedConnections);
   router.post('/request/:id', authenticateToken, sendRequest);
   router.put('/accept/:id', authenticateToken, acceptRequest);
   router.delete('/:id', authenticateToken, removeConnection);

@@ -240,3 +240,111 @@
   color: var(--text-muted);
   padding: 40px;
 }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 5px 0;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  color: var(--primary);
+}
+
+.activeTab {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+/* Connections List */
+.connectionsSection {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--border-light);
+}
+
+.connectionList {
+  display: flex;
+  flex-direction: column;
+}
+
+.connectionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.connectionItem:last-child {
+  border-bottom: none;
+}
+
+.connInfo {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.connAvatar, .connAvatarPlaceholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.connAvatarPlaceholder {
+  background: var(--bg-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.connName {
+  font-weight: 600;
+  color: var(--text-primary);
+  display: block;
+}
+
+.connName:hover {
+  text-decoration: underline;
+}
+
+.connBio {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.removeBtn {
+  background: transparent;
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.removeBtn:hover {
+  background: #ff4d4d;
+  color: white;
+}

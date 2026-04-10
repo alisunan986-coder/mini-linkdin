@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import styles from './Layout.module.css';
 
 export default function Layout() {
-  const { logout } = useAuth();
+  const { logout, notificationCount } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -20,7 +20,12 @@ export default function Layout() {
         <Link to="/" className={styles.logo}>Mini LinkedIn</Link>
         <nav className={styles.nav}>
           <Link to="/">Feed</Link>
-          <Link to="/network">Network</Link>
+          <Link to="/network" className={styles.navLink}>
+            Network
+            {notificationCount > 0 && (
+              <span className={styles.badge}>{notificationCount}</span>
+            )}
+          </Link>
           <Link to="/jobs">Jobs</Link>
           <Link to="/profile/me">Profile</Link>
           <Link to="/profile/edit">Edit Profile</Link>

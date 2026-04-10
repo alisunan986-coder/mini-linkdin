@@ -69,6 +69,7 @@ export const api = {
   connections: {
     getSuggestions: () => request('/api/connections/suggestions'),
     getPending: () => request('/api/connections/pending'),
+    getAllAccepted: () => request('/api/connections/accepted'), // Updated this
     sendRequest: (userId) => request(`/api/connections/request/${userId}`, { method: 'POST' }),
     accept: (userId) => request(`/api/connections/accept/${userId}`, { method: 'PUT' }),
     remove: (userId) => request(`/api/connections/${userId}`, { method: 'DELETE' }),

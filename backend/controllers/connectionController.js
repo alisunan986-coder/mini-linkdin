@@ -126,3 +126,25 @@ export const removeConnection = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+/**
+ * GET /api/connections - Get all accepted connections
+ */
+export const getAcceptedConnections = async (req, res) => {
+  try {
+    const userId = Number(req.user.id);
+    const [rows] = await pool.query(`
+      SELECT u.id, u.name, u.bio, u.profile_picture
+      FROM users u
+      WHERE u.id IN (
+        SELECT connected_user_id FROM connections WHERE user_id = ? AND status = 'accepted'
+        UNION
+        SELECT user_id FROM connections WHERE connected_user_id = ? AND status = 'accepted'
+      )
+    `, [userId, userId]);
+    res.json(rows);
+  } catch (err) {
+    console.error('getAcceptedConnections error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
