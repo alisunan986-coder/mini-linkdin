@@ -1,16 +1,26 @@
 /**
  * Jobs Page - View and post job opportunities
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { api } from '../api/api.js';
+import ApplyModal from '../components/ApplyModal.jsx';
 import styles from './Jobs.module.css';
 
 export default function Jobs() {
   const { user } = useAuth();
   const [jobs, setJobs] = useState([]);
+  const [myApplications, setMyApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  
+  // Application Modal State
+  const [applyingJob, setApplyingJob] = useState(null);
+  
+  // Recruiter: View Applicants State
+  const [viewingApplicantsFor, setViewingApplicantsFor] = useState(null);
+  const [applicants, setApplicants] = useState([]);
+  const [loadingApplicants, setLoadingApplicants] = useState(false);
   
   // Form State
   const [title, setTitle] = useState('');
@@ -26,6 +36,7 @@ export default function Jobs() {
 
   useEffect(() => {
     fetchJobs();
+    fetchMyApplications();
   }, []);
 
   const fetchJobs = async () => {
@@ -36,6 +47,38 @@ export default function Jobs() {
       console.error('Failed to fetch jobs:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchMyApplications = async () => {
+    if (!user) return;
+    try {
+      const data = await api.applications.getMe();
+      setMyApplications(data);
+    } catch (err) {
+      console.error('Failed to fetch my applications:', err);
+    }
+  };
+
+  const fetchApplicants = async (jobId) => {
+    setLoadingApplicants(true);
+    setViewingApplicantsFor(jobId);
+    try {
+      const data = await api.applications.getJobApplicants(jobId);
+      setApplicants(data);
+    } catch (err) {
+      alert('Failed to load applicants');
+    } finally {
+      setLoadingApplicants(false);
+    }
+  };
+
+  const handleUpdateStatus = async (appId, status) => {
+    try {
+      await api.applications.updateStatus(appId, status);
+      setApplicants(prev => prev.map(a => a.id === appId ? { ...a, status } : a));
+    } catch (err) {
+      alert('Failed to update status');
     }
   };
 
@@ -170,36 +213,109 @@ export default function Jobs() {
         </div>
       ) : (
         <div className={styles.jobList}>
-          {filteredJobs.map((job) => (
-            <div key={job.id} className={styles.jobCard}>
-              <div className={styles.cardHeader}>
-                <div>
-                  <h3 className={styles.jobTitle}>{job.title}</h3>
-                  <p className={styles.companyInfo}>{job.company} • {job.location}</p>
+          {filteredJobs.map((job) => {
+            const hasApplied = myApplications.some(app => app.job_id === job.id);
+            const isMyJob = user?.id === job.user_id;
+
+            return (
+              <div key={job.id} className={styles.jobCard}>
+                <div className={styles.cardHeader}>
+                  <div>
+                    <h3 className={styles.jobTitle}>{job.title}</h3>
+                    <p className={styles.companyInfo}>{job.company} • {job.location}</p>
+                  </div>
+                  <span className={`${styles.badge} ${styles[job.type.toLowerCase().replace('-', '')]}`}>
+                    {job.type}
+                  </span>
                 </div>
-                <span className={`${styles.badge} ${styles[job.type.toLowerCase().replace('-', '')]}`}>
-                  {job.type}
-                </span>
+                <p className={styles.description}>{job.description}</p>
+                <div className={styles.cardFooter}>
+                  <div className={styles.footerLeft}>
+                    <span className={styles.postedBy}>Posted by: {job.poster_name || 'HR'}</span>
+                    {isMyJob && (
+                      <button 
+                        onClick={() => fetchApplicants(job.id)}
+                        className={styles.viewApplicantsBtn}
+                      >
+                        👥 View Applicants
+                      </button>
+                    )}
+                  </div>
+                  <div className={styles.footerRight}>
+                    {hasApplied ? (
+                      <button className={styles.appliedBtn} disabled>
+                        ✓ Applied
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => setApplyingJob(job)} 
+                        className={styles.applyBtn}
+                        disabled={isMyJob}
+                      >
+                        {isMyJob ? 'My Posting' : 'Apply Now'}
+                      </button>
+                    )}
+                    {isMyJob && (
+                      <button onClick={() => handleDelete(job.id)} className={styles.deleteBtn}>
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Recruiter: Applicants List */}
+                {viewingApplicantsFor === job.id && (
+                  <div className={styles.applicantsSection}>
+                    <h4>Applicants for this role</h4>
+                    {loadingApplicants ? (
+                      <p>Loading talent...</p>
+                    ) : applicants.length === 0 ? (
+                      <p className={styles.noApps}>No applicants yet.</p>
+                    ) : (
+                      <div className={styles.applicantGrid}>
+                        {applicants.map(app => (
+                          <div key={app.id} className={styles.applicantCard}>
+                            <div className={styles.appNameRow}>
+                               <strong>{app.full_name}</strong>
+                               <span className={`${styles.statusBadge} ${styles[app.status]}`}>
+                                 {app.status}
+                               </span>
+                            </div>
+                            <p className={styles.appEmail}>{app.email}</p>
+                            <div className={styles.appActions}>
+                              <a 
+                                href={app.resume_url} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className={styles.resumeLink}
+                              >
+                                📄 View Resume
+                              </a>
+                              <div className={styles.statusButtons}>
+                                <button onClick={() => handleUpdateStatus(app.id, 'shortlisted')} className={styles.shortlistBtn}>Shortlist</button>
+                                <button onClick={() => handleUpdateStatus(app.id, 'rejected')} className={styles.rejectBtn}>Reject</button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <button onClick={() => setViewingApplicantsFor(null)} className={styles.closeApplicants}>Close</button>
+                  </div>
+                )}
               </div>
-              <p className={styles.description}>{job.description}</p>
-              <div className={styles.cardFooter}>
-                <div className={styles.footerLeft}>
-                  <span className={styles.postedBy}>Posted by: {job.poster_name || 'HR'}</span>
-                </div>
-                <div className={styles.footerRight}>
-                  <button onClick={handleApply} className={styles.applyBtn}>
-                    Apply Now
-                  </button>
-                  {user?.id === job.user_id && (
-                    <button onClick={() => handleDelete(job.id)} className={styles.deleteBtn}>
-                      Delete
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
+      )}
+
+      {applyingJob && (
+        <ApplyModal 
+          job={applyingJob} 
+          user={user} 
+          onClose={() => setApplyingJob(null)} 
+          onSuccess={fetchMyApplications}
+        />
       )}
     </div>
   );

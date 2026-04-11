@@ -85,4 +85,10 @@ export const api = {
   ai: {
     improvePost: (body) => request('/api/ai/improve-post', { method: 'POST', body: JSON.stringify(body) }),
   },
+  applications: {
+    apply: (body) => request('/api/applications', { method: 'POST', body: body instanceof FormData ? body : JSON.stringify(body) }),
+    getMe: () => request('/api/applications/me'),
+    getJobApplicants: (jobId) => request(`/api/applications/job/${jobId}`),
+    updateStatus: (id, status) => request(`/api/applications/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  },
 };

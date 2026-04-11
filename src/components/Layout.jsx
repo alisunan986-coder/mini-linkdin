@@ -27,6 +27,7 @@ export default function Layout() {
             )}
           </Link>
           <Link to="/jobs">Jobs</Link>
+          <Link to="/my-applications">My Apps</Link>
           <Link to="/profile/me">Profile</Link>
           <Link to="/profile/edit">Edit Profile</Link>
           <button type="button" className={styles.logoutBtn} onClick={handleLogout}>

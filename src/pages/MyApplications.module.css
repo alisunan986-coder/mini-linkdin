@@ -1,0 +1,145 @@
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  color: var(--text-muted);
+}
+
+.appList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.appCard {
+  background: white;
+  border: 1px solid var(--border-light, #eee);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.appCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.appHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.jobTitle {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--primary, #0073b1);
+}
+
+.company {
+  margin: 4px 0 0 0;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.statusBadge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.applied { background: #e7f3ff; color: #0073b1; }
+.viewed { background: #f3f3f3; color: #666; }
+.shortlisted { background: #e6fcf5; color: #0ca678; }
+.rejected { background: #fff5f5; color: #fa5252; }
+
+.appDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.detailItem {
+  display: flex;
+  gap: 12px;
+  font-size: 0.9rem;
+}
+
+.label {
+  color: var(--text-muted);
+  min-width: 140px;
+}
+
+.value {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.resumeLink {
+  color: var(--primary, #0073b1);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.resumeLink:hover {
+  text-decoration: underline;
+}
+
+.congratsBox {
+  margin-top: 20px;
+  padding: 16px;
+  background: #e6fcf5;
+  border: 1px solid #0ca678;
+  border-radius: 8px;
+  color: #087f5b;
+  font-weight: 600;
+  font-size: 0.95rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
+}
+
+.loader {
+  text-align: center;
+  padding: 100px 0;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.empty {
+  text-align: center;
+  padding: 80px 0;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px dashed #ddd;
+}
+
+.emptyIcon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  opacity: 0.3;
+}

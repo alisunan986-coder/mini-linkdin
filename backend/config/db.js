@@ -110,6 +110,20 @@ const pool = {
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
       FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
     );
+    CREATE TABLE IF NOT EXISTS applications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      job_id INTEGER NOT NULL,
+      full_name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      resume_url TEXT NOT NULL,
+      cover_letter TEXT,
+      status TEXT DEFAULT 'applied',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, job_id),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
+    );
     PRAGMA foreign_keys = ON;
   `);
 
