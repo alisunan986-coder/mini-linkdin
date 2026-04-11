@@ -76,9 +76,11 @@ const pool = {
       post_id INTEGER NOT NULL,
       user_id INTEGER NOT NULL,
       comment_text TEXT NOT NULL,
+      parent_id INTEGER DEFAULT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (parent_id) REFERENCES comments(id) ON DELETE CASCADE
     );
     CREATE TABLE IF NOT EXISTS connections (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -110,6 +112,15 @@ const pool = {
     );
     PRAGMA foreign_keys = ON;
   `);
+
+  // Safe ALTER TABLE for existing databases
+  try {
+    await db.exec('ALTER TABLE comments ADD COLUMN parent_id INTEGER DEFAULT NULL');
+    console.log('Database: Added parent_id to comments table.');
+  } catch (err) {
+    // Column likely already exists, ignore error
+  }
+
   console.log('SQLite database initialized.');
 })();
 

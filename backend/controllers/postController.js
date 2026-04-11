@@ -10,25 +10,54 @@ import pool from '../config/db.js';
 export const getAllPosts = async (req, res) => {
   try {
     const userId = req.user ? req.user.id : null;
+    
+    // Union original posts and reposts for a unified feed
     const [rows] = await pool.query(`
       SELECT p.id, p.user_id, p.content, p.image_url, p.created_at,
              u.name AS user_name, u.profile_picture AS user_profile_picture, u.bio AS user_bio,
              (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
              (SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comment_count,
              (SELECT COUNT(*) FROM reposts WHERE post_id = p.id) AS repost_count,
+             NULL AS reposted_by_name,
+             p.created_at AS activity_date,
              CASE 
                WHEN p.user_id = ? THEN 1
                WHEN p.user_id IN (
                  SELECT connected_user_id FROM connections WHERE user_id = ? AND status = 'accepted'
                  UNION
                  SELECT user_id FROM connections WHERE connected_user_id = ? AND status = 'accepted'
-               ) THEN 1 
+               ) THEN 2 -- Prioritize connections' original posts
                ELSE 0 
-             END AS is_connection
+             END AS relevance_score
       FROM posts p
       JOIN users u ON p.user_id = u.id
-      ORDER BY is_connection DESC, p.created_at DESC
-    `, [userId, userId, userId]);
+
+      UNION ALL
+
+      SELECT p.id, p.user_id, p.content, p.image_url, p.created_at,
+             u.name AS user_name, u.profile_picture AS user_profile_picture, u.bio AS user_bio,
+             (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
+             (SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comment_count,
+             (SELECT COUNT(*) FROM reposts WHERE post_id = p.id) AS repost_count,
+             ru.name AS reposted_by_name,
+             r.created_at AS activity_date,
+             CASE 
+               WHEN r.user_id = ? THEN 1
+               WHEN r.user_id IN (
+                 SELECT connected_user_id FROM connections WHERE user_id = ? AND status = 'accepted'
+                 UNION
+                 SELECT user_id FROM connections WHERE connected_user_id = ? AND status = 'accepted'
+               ) THEN 2 -- Prioritize connections' reposts
+               ELSE 0 
+             END AS relevance_score
+      FROM reposts r
+      JOIN posts p ON r.post_id = p.id
+      JOIN users u ON p.user_id = u.id
+      JOIN users ru ON r.user_id = ru.id
+
+      ORDER BY relevance_score DESC, activity_date DESC
+      LIMIT 50
+    `, [userId, userId, userId, userId, userId, userId]);
     res.json(rows);
   } catch (err) {
     console.error('getAllPosts error:', err);

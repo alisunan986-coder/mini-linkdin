@@ -55,7 +55,7 @@ export const api = {
     update: (id, body) => request(`/api/posts/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
     delete: (id) => request(`/api/posts/${id}`, { method: 'DELETE' }),
     getComments: (postId) => request(`/api/posts/${postId}/comments`),
-    addComment: (postId, body) => request(`/api/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify(body) }),
+    addComment: (postId, body) => request(`/api/posts/${postId}/comments`, { method: 'POST', body: JSON.stringify(body) }), // body can include parent_id
     toggleLike: (postId) => request(`/api/posts/${postId}/like`, { method: 'POST' }),
     getLikeStatus: (postId) => request(`/api/posts/${postId}/like`),
     toggleRepost: (postId) => request(`/api/posts/${postId}/repost`, { method: 'POST' }),
@@ -81,5 +81,8 @@ export const api = {
     getByUser: (userId) => request(`/api/skills/user/${userId}`),
     add: (body) => request('/api/skills', { method: 'POST', body: JSON.stringify(body) }),
     delete: (id) => request(`/api/skills/${id}`, { method: 'DELETE' }),
+  },
+  ai: {
+    improvePost: (body) => request('/api/ai/improve-post', { method: 'POST', body: JSON.stringify(body) }),
   },
 };

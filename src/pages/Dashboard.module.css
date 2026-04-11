@@ -122,8 +122,132 @@
 .createForm {
   flex: 1;
   display: flex;
+  flex-direction: column;
   gap: 12px;
+}
+
+.postTextarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  background: var(--bg-card);
+  transition: border-color 0.2s;
+}
+
+.postTextarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.postActionsRow {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+}
+
+.aiControls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.aiModeSelect {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border-light);
+  font-size: 0.8rem;
+  background: white;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.aiAssistBtn {
+  background: #f0f7ff;
+  color: var(--primary);
+  border: 1px solid #cce4ff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.aiAssistBtn:hover:not(:disabled) {
+  background: #e0efff;
+  border-color: var(--primary);
+}
+
+.aiAssistBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* AI Preview Box */
+.aiPreviewBox {
+  margin: 16px 0;
+  border: 1px solid #d1e9ff;
+  border-radius: 8px;
+  background: #f9fcff;
+  overflow: hidden;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.aiPreviewHeader {
+  background: #edf6ff;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.aiBadge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #0073b1;
+  letter-spacing: 0.5px;
+}
+
+.aiPreviewActions {
+  display: flex;
+  gap: 12px;
+}
+
+.aiDiscardBtn, .aiApplyBtn {
+  background: transparent;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.aiDiscardBtn {
+  color: var(--text-muted);
+}
+
+.aiApplyBtn {
+  color: #0073b1;
+}
+
+.aiApplyBtn:hover {
+  text-decoration: underline;
+}
+
+.aiPreviewContent {
+  padding: 12px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  white-space: pre-wrap;
 }
 
 .pillsInput {

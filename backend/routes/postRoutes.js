@@ -36,7 +36,7 @@ const postContentValidation = body('content').trim().notEmpty().withMessage('Con
 const commentValidation = body('comment_text').trim().notEmpty().withMessage('Comment text is required');
 
 export default function postRoutes(router) {
-  router.get('/', getAllPosts);
+  router.get('/', authenticateToken, getAllPosts);
   router.get('/:id', getPostById);
   router.post('/', authenticateToken, upload.single('postImage'), [postContentValidation], createPost);
   router.put('/:id', authenticateToken, [postContentValidation], updatePost);

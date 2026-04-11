@@ -17,6 +17,9 @@ export default function Dashboard() {
   const [newPost, setNewPost] = useState('');
   const [postImage, setPostImage] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [aiImproving, setAiImproving] = useState(false);
+  const [aiResult, setAiResult] = useState('');
+  const [aiMode, setAiMode] = useState('professional');
 
   const fetchPosts = useCallback(() => {
     api.posts
@@ -28,16 +31,46 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchPosts();
+    const timer = setInterval(fetchPosts, POLL_INTERVAL_MS);
+    return () => clearInterval(timer);
   }, [fetchPosts]);
 
-  useEffect(() => {
-    const id = setInterval(fetchPosts, POLL_INTERVAL_MS);
-    return () => clearInterval(id);
-  }, [fetchPosts]);
+  const handleImprovePost = async () => {
+    if (!newPost.trim() || aiImproving) return;
+    setAiImproving(true);
+    setAiResult('');
+    try {
+      const resp = await api.ai.improvePost({ text: newPost, mode: aiMode });
+      setAiResult(resp.improved);
+    } catch (err) {
+      alert(err.error || 'AI Assistant is currently busy. Please try again.');
+    } finally {
+      setAiImproving(false);
+    }
+  };
+
+  const applyAiVersion = () => {
+    setNewPost(aiResult);
+    setAiResult('');
+  };
 
   const handleCreatePost = async (e) => {
-    e.preventDefault();
-    if (!newPost.trim() || !user || submitting) return;
+    if (e) e.preventDefault();
+    console.log('[Dashboard] Attempting to create post...');
+    
+    if (!newPost.trim()) {
+      console.warn('[Dashboard] Post content is empty.');
+      return;
+    }
+    if (!user) {
+      console.error('[Dashboard] No user logged in.');
+      return;
+    }
+    if (submitting) {
+      console.warn('[Dashboard] Already submitting...');
+      return;
+    }
+
     setSubmitting(true);
     try {
       let body;
@@ -48,11 +81,17 @@ export default function Dashboard() {
       } else {
         body = { content: newPost.trim() };
       }
+      
+      console.log('[Dashboard] Calling API with:', body);
       const created = await api.posts.create(body);
+      console.log('[Dashboard] Post created successfully:', created);
+      
       setPosts((prev) => [created, ...prev]);
       setNewPost('');
       setPostImage(null);
+      setAiResult('');
     } catch (err) {
+      console.error('[Dashboard] Create post failed:', err);
       alert(err.error || 'Failed to create post');
     } finally {
       setSubmitting(false);
@@ -105,22 +144,63 @@ export default function Dashboard() {
                 <div className={styles.tinyAvatarPlaceholder}>{user.name.charAt(0)}</div>
               )}
               <form onSubmit={handleCreatePost} className={styles.createForm}>
-                <input
-                  type="text"
+                <textarea
                   value={newPost}
                   onChange={(e) => setNewPost(e.target.value)}
-                  placeholder="Start a post"
-                  className={styles.pillsInput}
+                  placeholder="What's on your mind?"
+                  className={styles.postTextarea}
+                  rows={3}
                 />
-                <button 
-                  type="submit" 
-                  className={styles.postBtn}
-                  disabled={!newPost.trim() || submitting}
-                >
-                  {submitting ? 'Posting...' : 'Post'}
-                </button>
+                
+                <div className={styles.postActionsRow}>
+                  <div className={styles.aiControls}>
+                    <select 
+                      value={aiMode} 
+                      onChange={(e) => setAiMode(e.target.value)}
+                      className={styles.aiModeSelect}
+                      title="Select AI improvement style"
+                    >
+                      <option value="professional">👔 Professional</option>
+                      <option value="viral">🚀 Viral / Engaging</option>
+                      <option value="short">✂️ Concise</option>
+                      <option value="grammar">✍️ Fix Grammar</option>
+                    </select>
+                    <button 
+                      type="button" 
+                      onClick={handleImprovePost}
+                      disabled={!newPost.trim() || aiImproving}
+                      className={styles.aiAssistBtn}
+                    >
+                      {aiImproving ? '🪄 Improving...' : '🪄 Improve with AI'}
+                    </button>
+                  </div>
+                  <button 
+                    type="submit" 
+                    className={styles.postBtn}
+                    disabled={!newPost.trim() || submitting}
+                    onClick={handleCreatePost}
+                  >
+                    {submitting ? 'Posting...' : 'Post'}
+                  </button>
+                </div>
               </form>
             </div>
+
+            {aiResult && (
+              <div className={styles.aiPreviewBox}>
+                <div className={styles.aiPreviewHeader}>
+                  <span className={styles.aiBadge}>AI SUGGESTION</span>
+                  <div className={styles.aiPreviewActions}>
+                    <button onClick={() => setAiResult('')} className={styles.aiDiscardBtn}>Discard</button>
+                    <button onClick={applyAiVersion} className={styles.aiApplyBtn}>Use this text</button>
+                  </div>
+                </div>
+                <div className={styles.aiPreviewContent}>
+                  {aiResult}
+                </div>
+              </div>
+            )}
+
             <div className={styles.createActions}>
               <label htmlFor="post-image-input" className={styles.actionBtn}>
                 <span className={styles.icon}>📷</span> Photo

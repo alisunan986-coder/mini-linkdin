@@ -10,7 +10,7 @@ import pool from '../config/db.js';
 export const getCommentsByPostId = async (req, res) => {
   try {
     const [rows] = await pool.query(`
-      SELECT c.id, c.post_id, c.user_id, c.comment_text, c.created_at,
+      SELECT c.id, c.post_id, c.user_id, c.comment_text, c.parent_id, c.created_at,
              u.name AS user_name, u.profile_picture AS user_profile_picture
       FROM comments c
       JOIN users u ON c.user_id = u.id
@@ -34,7 +34,7 @@ export const createComment = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
     const postId = req.params.postId;
-    const { comment_text } = req.body;
+    const { comment_text, parent_id } = req.body;
 
     const [postExists] = await pool.query('SELECT id FROM posts WHERE id = ?', [postId]);
     if (postExists.length === 0) {
@@ -42,11 +42,11 @@ export const createComment = async (req, res) => {
     }
 
     const [result] = await pool.query(
-      'INSERT INTO comments (post_id, user_id, comment_text) VALUES (?, ?, ?)',
-      [postId, req.user.id, comment_text]
+      'INSERT INTO comments (post_id, user_id, comment_text, parent_id) VALUES (?, ?, ?, ?)',
+      [postId, req.user.id, comment_text, parent_id || null]
     );
     const [newComment] = await pool.query(`
-      SELECT c.id, c.post_id, c.user_id, c.comment_text, c.created_at,
+      SELECT c.id, c.post_id, c.user_id, c.comment_text, c.parent_id, c.created_at,
              u.name AS user_name, u.profile_picture AS user_profile_picture
       FROM comments c
       JOIN users u ON c.user_id = u.id
