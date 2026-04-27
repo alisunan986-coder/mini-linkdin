@@ -18,6 +18,7 @@ import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 import Jobs from './pages/Jobs';
 import MyApplications from './pages/MyApplications';
+import Messaging from './pages/Messaging';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -49,6 +50,7 @@ export default function App() {
             <Route path="network" element={<Network />} />
             <Route path="jobs" element={<Jobs />} />
             <Route path="my-applications" element={<MyApplications />} />
+            <Route path="messaging" element={<Messaging />} />
             <Route path="profile/edit" element={<EditProfile />} />
             <Route path="profile" element={<Navigate to="/profile/me" replace />} />
             <Route path="profile/:id" element={<Profile />} />

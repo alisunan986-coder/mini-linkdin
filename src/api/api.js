@@ -91,4 +91,9 @@ export const api = {
     getJobApplicants: (jobId) => request(`/api/applications/job/${jobId}`),
     updateStatus: (id, status) => request(`/api/applications/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
   },
+  messages: {
+    getConversations: () => request('/api/messages'),
+    getHistory: (userId) => request(`/api/messages/${userId}`),
+    send: (body) => request('/api/messages', { method: 'POST', body: JSON.stringify(body) }),
+  },
 };

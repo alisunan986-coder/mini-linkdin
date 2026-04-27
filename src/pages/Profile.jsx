@@ -2,7 +2,7 @@
  * Profile page - View user profile with skills and their posts
  */
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { api } from '../api/api.js';
 import ProfileHeader from '../components/ProfileHeader.jsx';
@@ -13,6 +13,7 @@ import styles from './Profile.module.css';
 export default function Profile() {
   const { id } = useParams();
   const { user: currentUser } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [skills, setSkills] = useState([]);
   const [posts, setPosts] = useState([]);
@@ -112,6 +113,7 @@ export default function Profile() {
           ) : (
             <button onClick={handleConnect} className={styles.connectBtn}>Connect</button>
           )}
+          <button onClick={() => navigate(`/messaging?userId=${userId}`)} className={styles.msgBtn}>Message</button>
         </div>
       )}
 

@@ -56,7 +56,7 @@ export const register = async (req, res) => {
     });
   } catch (error) {
     console.error('[Auth] Registration Error:', error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal Server Error', message: error.message });
   }
 };
 
@@ -113,6 +113,6 @@ export const login = async (req, res) => {
     });
   } catch (error) {
     console.error('[Auth] Login Error:', error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal Server Error', message: error.message });
   }
 };

@@ -1,11 +1,19 @@
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Ensure the database path is absolute and points to backend/database.sqlite
+const dbPath = path.resolve(__dirname, '..', 'database.sqlite');
 
 const dbPromise = open({
-  filename: '../database.sqlite', // File is in the backend root, not a subfolder
+  filename: dbPath,
   driver: sqlite3.Database
 }).catch(err => {
-  console.error('FAILED TO OPEN DATABASE:', err.message);
+  console.error('CRITICAL: FAILED TO OPEN DATABASE:', err.message);
   throw err;
 });
 
@@ -123,6 +131,16 @@ const pool = {
       UNIQUE(user_id, job_id),
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
       FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
+    );
+    CREATE TABLE IF NOT EXISTS messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sender_id INTEGER NOT NULL,
+      receiver_id INTEGER NOT NULL,
+      content TEXT NOT NULL,
+      is_read INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
     );
     PRAGMA foreign_keys = ON;
   `);
