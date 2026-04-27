@@ -145,13 +145,16 @@ const pool = {
     PRAGMA foreign_keys = ON;
   `);
 
-  // Safe ALTER TABLE for existing databases
+  // Migrations for existing databases
   try {
     await db.exec('ALTER TABLE comments ADD COLUMN parent_id INTEGER DEFAULT NULL');
     console.log('Database: Added parent_id to comments table.');
-  } catch (err) {
-    // Column likely already exists, ignore error
-  }
+  } catch (err) { /* ignore if already exists */ }
+
+  try {
+    await db.exec('ALTER TABLE posts ADD COLUMN image_url TEXT');
+    console.log('Database: Added image_url to posts table.');
+  } catch (err) { /* ignore if already exists */ }
 
   console.log('SQLite database initialized.');
 })();

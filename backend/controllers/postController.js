@@ -13,7 +13,7 @@ export const getAllPosts = async (req, res) => {
     
     // Union original posts and reposts for a unified feed
     const [rows] = await pool.query(`
-      SELECT p.id, p.user_id, p.content, p.image_url, p.created_at,
+      SELECT p.id, p.id || '-orig' AS feed_id, p.user_id, p.content, p.image_url, p.created_at,
              u.name AS user_name, u.profile_picture AS user_profile_picture, u.bio AS user_bio,
              (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
              (SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comment_count,
@@ -34,7 +34,7 @@ export const getAllPosts = async (req, res) => {
 
       UNION ALL
 
-      SELECT p.id, p.user_id, p.content, p.image_url, p.created_at,
+      SELECT p.id, p.id || '-' || ru.name AS feed_id, p.user_id, p.content, p.image_url, p.created_at,
              u.name AS user_name, u.profile_picture AS user_profile_picture, u.bio AS user_bio,
              (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
              (SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comment_count,
@@ -60,8 +60,8 @@ export const getAllPosts = async (req, res) => {
     `, [userId, userId, userId, userId, userId, userId]);
     res.json(rows);
   } catch (err) {
-    console.error('getAllPosts error:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('getAllPosts error:', err.message);
+    res.status(500).json({ error: 'Server error', message: err.message });
   }
 };
 
@@ -83,8 +83,8 @@ export const getPostById = async (req, res) => {
     }
     res.json(rows[0]);
   } catch (err) {
-    console.error('getPostById error:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('getPostById error:', err.message);
+    res.status(500).json({ error: 'Server error', message: err.message });
   }
 };
 
@@ -99,12 +99,15 @@ export const createPost = async (req, res) => {
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
+    const userId = Number(req.user.id);
     const { content } = req.body;
     const image_url = req.file ? `/uploads/${req.file.filename}` : null;
+    
     const [result] = await pool.query(
       'INSERT INTO posts (user_id, content, image_url) VALUES (?, ?, ?)',
-      [req.user.id, content, image_url]
+      [userId, content, image_url]
     );
+
     const [newPost] = await pool.query(`
       SELECT p.id, p.user_id, p.content, p.image_url, p.created_at,
              u.name AS user_name, u.profile_picture AS user_profile_picture, u.bio AS user_bio,
@@ -113,10 +116,15 @@ export const createPost = async (req, res) => {
       JOIN users u ON p.user_id = u.id
       WHERE p.id = ?
     `, [result.insertId]);
+
+    if (!newPost || newPost.length === 0) {
+      throw new Error('Post created but could not be retrieved.');
+    }
+
     res.status(201).json(newPost[0]);
   } catch (err) {
-    console.error('createPost error:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('createPost error:', err.message);
+    res.status(500).json({ error: 'Server error', message: err.message });
   }
 };
 
@@ -149,8 +157,8 @@ export const updatePost = async (req, res) => {
     `, [req.params.id]);
     res.json(updated[0]);
   } catch (err) {
-    console.error('updatePost error:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('updatePost error:', err.message);
+    res.status(500).json({ error: 'Server error', message: err.message });
   }
 };
 
@@ -169,8 +177,8 @@ export const deletePost = async (req, res) => {
     await pool.query('DELETE FROM posts WHERE id = ?', [req.params.id]);
     res.json({ message: 'Post deleted' });
   } catch (err) {
-    console.error('deletePost error:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('deletePost error:', err.message);
+    res.status(500).json({ error: 'Server error', message: err.message });
   }
 };
 
@@ -198,8 +206,8 @@ export const toggleRepost = async (req, res) => {
       return res.json({ reposted: true });
     }
   } catch (err) {
-    console.error('toggleRepost error:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('toggleRepost error:', err.message);
+    res.status(500).json({ error: 'Server error', message: err.message });
   }
 };
 
@@ -211,7 +219,7 @@ export const getUserActivity = async (req, res) => {
     const targetUserId = req.params.id;
 
     const [rows] = await pool.query(`
-      SELECT p.id, p.user_id, p.content, p.image_url, p.created_at,
+      SELECT p.id, p.id || '-orig' AS feed_id, p.user_id, p.content, p.image_url, p.created_at,
              u.name AS user_name, u.profile_picture AS user_profile_picture, u.bio AS user_bio,
              (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
              (SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comment_count,
@@ -224,7 +232,7 @@ export const getUserActivity = async (req, res) => {
 
       UNION ALL
 
-      SELECT p.id, p.user_id, p.content, p.image_url, p.created_at,
+      SELECT p.id, p.id || '-' || target_u.name AS feed_id, p.user_id, p.content, p.image_url, p.created_at,
              u.name AS user_name, u.profile_picture AS user_profile_picture, u.bio AS user_bio,
              (SELECT COUNT(*) FROM likes WHERE post_id = p.id) AS like_count,
              (SELECT COUNT(*) FROM comments WHERE post_id = p.id) AS comment_count,
@@ -242,8 +250,8 @@ export const getUserActivity = async (req, res) => {
 
     res.json(rows);
   } catch (err) {
-    console.error('getUserActivity error:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('getUserActivity error:', err.message);
+    res.status(500).json({ error: 'Server error', message: err.message });
   }
 };
 

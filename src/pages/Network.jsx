@@ -2,13 +2,14 @@
  * Network Page - Manage connections and invitations
  */
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import styles from './Network.module.css';
 
 export default function Network() {
   const { fetchNotifications } = useAuth();
+  const navigate = useNavigate();
   const [suggestions, setSuggestions] = useState([]);
   const [pending, setPending] = useState([]);
   const [connections, setConnections] = useState([]);
@@ -180,7 +181,10 @@ export default function Network() {
                         <p className={styles.connBio}>{c.bio || 'Connected Professional'}</p>
                       </div>
                     </div>
-                    <button onClick={() => handleRemoveConnection(c.id)} className={styles.removeBtn}>Remove</button>
+                    <div className={styles.connActions}>
+                      <button onClick={() => navigate(`/messaging?userId=${c.id}`)} className={styles.msgBtn}>Message</button>
+                      <button onClick={() => handleRemoveConnection(c.id)} className={styles.removeBtn}>Remove</button>
+                    </div>
                  </div>
                ))}
                {search && filteredConnections.length === 0 && <p className={styles.smallMsg}>No matching connections found.</p>}

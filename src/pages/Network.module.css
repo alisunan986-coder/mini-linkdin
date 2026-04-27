@@ -348,3 +348,25 @@
   background: #ff4d4d;
   color: white;
 }
+
+.connActions {
+  display: flex;
+  gap: 10px;
+}
+
+.msgBtn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 15px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.msgBtn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}

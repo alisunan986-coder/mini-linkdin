@@ -12,8 +12,8 @@ export const getAllUsers = async (req, res) => {
     );
     res.json(rows);
   } catch (err) {
-    console.error('getAllUsers error:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('getAllUsers error:', err.message);
+    res.status(500).json({ error: 'Server error', message: err.message });
   }
 };
 
@@ -33,8 +33,8 @@ export const searchUsers = async (req, res) => {
     );
     res.json(rows);
   } catch (err) {
-    console.error('searchUsers error:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('searchUsers error:', err.message);
+    res.status(500).json({ error: 'Server error', message: err.message });
   }
 };
 
@@ -52,8 +52,8 @@ export const getMe = async (req, res) => {
     }
     res.json(rows[0]);
   } catch (err) {
-    console.error('getMe error:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('getMe error:', err.message);
+    res.status(500).json({ error: 'Server error', message: err.message });
   }
 };
 
@@ -62,17 +62,22 @@ export const getMe = async (req, res) => {
  */
 export const getUserById = async (req, res) => {
   try {
+    const targetId = Number(req.params.id);
+    if (isNaN(targetId)) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
+
     const [rows] = await pool.query(
       'SELECT id, name, email, bio, profile_picture, created_at FROM users WHERE id = ?',
-      [req.params.id]
+      [targetId]
     );
     if (rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
     res.json(rows[0]);
   } catch (err) {
-    console.error('getUserById error:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('getUserById error:', err.message);
+    res.status(500).json({ error: 'Server error', message: err.message });
   }
 };
 
@@ -131,7 +136,7 @@ export const updateMe = async (req, res) => {
     );
     res.json(rows[0]);
   } catch (err) {
-    console.error('updateMe error:', err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('updateMe error:', err.message);
+    res.status(500).json({ error: 'Server error', message: err.message });
   }
 };

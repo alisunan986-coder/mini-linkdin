@@ -12,6 +12,7 @@ export default function Messaging() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [searchResults, setSearchResults] = useState([]);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -32,6 +33,25 @@ export default function Messaging() {
     } catch (err) {
       console.error('Failed to pre-load user for chat');
     }
+  };
+
+  const handleSearch = async (query) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    try {
+      const results = await api.users.search(query);
+      // Filter out self
+      setSearchResults(results.filter(u => u.id !== user.id));
+    } catch (err) {
+      console.error('Search failed');
+    }
+  };
+
+  const startNewChat = (targetUser) => {
+    setActiveUser(targetUser);
+    setSearchResults([]);
   };
 
   useEffect(() => {
@@ -94,6 +114,24 @@ export default function Messaging() {
       <div className={styles.sidebar}>
         <div className={styles.sidebarHeader}>
           <h2>Messaging</h2>
+          <div className={styles.searchContainer}>
+            <input 
+              type="text" 
+              placeholder="Search people..." 
+              className={styles.searchBar}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+            {searchResults.length > 0 && (
+              <div className={styles.searchResults}>
+                {searchResults.map(u => (
+                  <div key={u.id} className={styles.resultItem} onClick={() => startNewChat(u)}>
+                    <img src={u.profile_picture || 'https://via.placeholder.com/30'} alt="" />
+                    <span>{u.name}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         <div className={styles.convList}>
           {loading ? (

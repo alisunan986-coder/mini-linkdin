@@ -125,7 +125,7 @@ export default function Profile() {
         ) : (
           posts.map((post) => (
             <PostCard
-              key={`${post.id}-${post.activity_date}`}
+              key={post.feed_id || `${post.id}-${post.activity_date}`}
               post={post}
               onUpdate={() => api.users.getActivity(userId).then(setPosts)}
               onDelete={(p) => setPosts((prev) => prev.filter((x) => x.id !== p.id))}

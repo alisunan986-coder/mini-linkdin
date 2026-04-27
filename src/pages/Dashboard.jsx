@@ -92,7 +92,8 @@ export default function Dashboard() {
       setAiResult('');
     } catch (err) {
       console.error('[Dashboard] Create post failed:', err);
-      alert(err.error || 'Failed to create post');
+      const msg = err.message || err.error || 'Failed to create post';
+      alert(msg);
     } finally {
       setSubmitting(false);
     }
@@ -236,7 +237,7 @@ export default function Dashboard() {
           <div className={styles.feed}>
             {posts.map((post) => (
               <PostCard
-                key={post.id}
+                key={post.feed_id || post.id}
                 post={post}
                 onUpdate={handlePostUpdate}
                 onDelete={handlePostDelete}
